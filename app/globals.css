@@ -154,6 +154,22 @@ a {
   overflow-wrap: anywhere;
 }
 
+.technical-detail {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.technical-detail summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.technical-detail p {
+  margin: 10px 0 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .section {
   overflow: hidden;
 }

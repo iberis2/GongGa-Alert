@@ -200,9 +200,22 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
         gap: 18px;
         margin-top: 18px;
       }
-      .health-message {
+  .health-message {
         margin: 0;
         color: var(--warn);
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+      }
+      .technical-detail {
+        margin-top: 12px;
+        color: var(--muted);
+      }
+      .technical-detail summary {
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .technical-detail p {
+        margin: 10px 0 0;
         line-height: 1.6;
         overflow-wrap: anywhere;
       }
@@ -312,6 +325,14 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
               </div>
               <div class="section-body">
                 <p class="health-message">${escapeHtml(state.lastErrorSummary || "")}</p>
+                ${
+                  state.lastTechnicalDetail
+                    ? `<details class="technical-detail">
+                        <summary>자세한 기술 정보</summary>
+                        <p>${escapeHtml(state.lastTechnicalDetail)}</p>
+                      </details>`
+                    : ""
+                }
               </div>
             </section>`
           : ""
@@ -364,6 +385,7 @@ const state = await readJson<MonitorState>("state.json", {
   lastChangedAt: null,
   lastFailedAt: null,
   lastErrorSummary: null,
+  lastTechnicalDetail: null,
   consecutiveFailureCount: 0
 });
 const history = await readJson<HistoryEntry[]>("history.json", []);

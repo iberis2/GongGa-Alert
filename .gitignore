@@ -5,6 +5,7 @@ node_modules
 coverage
 dist
 gh-pages
+monitor-result.json
 data/kakao-token*.json
 *.log
 tsconfig.tsbuildinfo

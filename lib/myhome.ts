@@ -71,6 +71,30 @@ export function formatMyHomeError(error: unknown) {
   return error instanceof Error ? `${error.name}: ${error.message}` : String(error);
 }
 
+export function explainMyHomeError(technicalDetail: string) {
+  if (technicalDetail.includes("UND_ERR_CONNECT_TIMEOUT")) {
+    return "마이홈 공고 페이지에 접속하지 못했습니다. 네트워크 연결이 시간 안에 완료되지 않았고, 총 3번 재시도했지만 실패했습니다. 마이홈 사이트가 일시적으로 느리거나 GitHub Actions 서버에서 마이홈 사이트 접속이 제한되었을 가능성이 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+  }
+
+  if (technicalDetail.includes("AbortError") || technicalDetail.includes("timeout")) {
+    return "마이홈 공고 페이지 응답을 기다렸지만 제한 시간 안에 완료되지 않았습니다. 사이트가 일시적으로 느리거나 네트워크 상태가 좋지 않을 수 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+  }
+
+  if (technicalDetail.includes("HTTP 4")) {
+    return "마이홈 공고 페이지가 요청을 받아들이지 않았습니다. 공고 링크가 바뀌었거나 접속 권한 또는 요청 방식이 맞지 않을 수 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+  }
+
+  if (technicalDetail.includes("HTTP 5")) {
+    return "마이홈 서버에서 오류 응답을 보냈습니다. 마이홈 사이트의 일시적인 문제일 가능성이 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+  }
+
+  if (technicalDetail.includes("입주대기자 수를 찾지 못했습니다")) {
+    return "마이홈 공고 페이지는 열렸지만 입주대기자 수를 찾지 못했습니다. 페이지 구조가 바뀌었거나 해당 공고의 표시 방식이 달라졌을 수 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+  }
+
+  return "마이홈 공고 페이지 확인 중 알 수 없는 문제가 발생했습니다. 기존에 저장된 입주대기자 수는 유지됩니다.";
+}
+
 export async function fetchNoticeHtml(
   url: string,
   options: {

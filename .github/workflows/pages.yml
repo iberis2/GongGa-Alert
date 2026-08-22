@@ -48,15 +48,18 @@ jobs:
 
       - name: Run monitor once
         id: monitor
-        run: pnpm monitor:once
-        continue-on-error: true
+        run: pnpm monitor:ci
 
       - name: Diagnose MyHome connectivity
-        if: steps.monitor.outcome == 'failure'
+        shell: bash
         run: |
-          curl -4 -v --connect-timeout 10 --max-time 30 \
-            "https://www.myhome.go.kr/hws/portal/sch/selectMoveWaitStsDetail.do?hsmpSn=30700355&suplyTy=02&atchFileId=FLE00016014&rtsSe=01&styleNm=46&drwtUnit=46" \
-            || true
+          if test -f monitor-result.json && node -e "process.exit(require('./monitor-result.json').status === 'failed' ? 0 : 1)"; then
+            curl -4 -v --connect-timeout 10 --max-time 30 \
+              "https://www.myhome.go.kr/hws/portal/sch/selectMoveWaitStsDetail.do?hsmpSn=30700355&suplyTy=02&atchFileId=FLE00016014&rtsSe=01&styleNm=46&drwtUnit=46" \
+              || true
+          else
+            echo "Monitor succeeded; skipping MyHome connectivity diagnostics."
+          fi
 
       - name: Commit updated data
         run: |

@@ -1,6 +1,6 @@
 import { DASHBOARD_URL } from "./config";
 import { sendKakaoChangeMessage } from "./kakao";
-import { fetchNoticeHtml, formatMyHomeError } from "./myhome";
+import { explainMyHomeError, fetchNoticeHtml, formatMyHomeError } from "./myhome";
 import { parseWaitlistCount } from "./parser";
 import {
   appendLog,
@@ -16,18 +16,24 @@ type MonitorDeps = {
   dashboardUrl?: string;
 };
 
-function markHealthy<T extends { lastFailedAt: string | null; lastErrorSummary: string | null; consecutiveFailureCount: number }>(
+function markHealthy<T extends {
+  lastFailedAt: string | null;
+  lastErrorSummary: string | null;
+  lastTechnicalDetail: string | null;
+  consecutiveFailureCount: number;
+}>(
   state: T
 ) {
   return {
     ...state,
     lastFailedAt: null,
     lastErrorSummary: null,
+    lastTechnicalDetail: null,
     consecutiveFailureCount: 0
   };
 }
 
-function summarizeMonitorError(error: unknown) {
+function getMonitorTechnicalDetail(error: unknown) {
   return formatMyHomeError(error);
 }
 
@@ -116,8 +122,9 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
     };
   } catch (error) {
     const latestState = await loadState();
-    const errorSummary = summarizeMonitorError(error);
-    const isSameError = latestState.lastErrorSummary === errorSummary;
+    const technicalDetail = getMonitorTechnicalDetail(error);
+    const errorSummary = explainMyHomeError(technicalDetail);
+    const isSameError = latestState.lastTechnicalDetail === technicalDetail;
     const consecutiveFailureCount = isSameError
       ? latestState.consecutiveFailureCount + 1
       : 1;
@@ -126,6 +133,7 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
       ...latestState,
       lastFailedAt: checkedAt,
       lastErrorSummary: errorSummary,
+      lastTechnicalDetail: technicalDetail,
       consecutiveFailureCount
     });
 
@@ -133,7 +141,7 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
       await appendLog({
         level: "error",
         message: "모니터 실행 중 오류가 발생했습니다.",
-        detail: errorSummary
+        detail: `${errorSummary}\n\n기술 상세: ${technicalDetail}`
       });
     }
 
@@ -141,7 +149,7 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
       await appendLog({
         level: "warn",
         message: "마이홈 확인이 3회 연속 실패했습니다.",
-        detail: errorSummary
+        detail: `${errorSummary}\n\n기술 상세: ${technicalDetail}`
       });
     }
 

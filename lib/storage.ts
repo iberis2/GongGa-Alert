@@ -15,6 +15,7 @@ const DEFAULT_STATE: MonitorState = {
   lastChangedAt: null,
   lastFailedAt: null,
   lastErrorSummary: null,
+  lastTechnicalDetail: null,
   consecutiveFailureCount: 0
 };
 
@@ -55,6 +56,7 @@ export async function loadState(): Promise<MonitorState> {
     lastChangedAt: state.lastChangedAt ?? null,
     lastFailedAt: state.lastFailedAt ?? null,
     lastErrorSummary: state.lastErrorSummary ?? null,
+    lastTechnicalDetail: state.lastTechnicalDetail ?? null,
     consecutiveFailureCount: state.consecutiveFailureCount ?? 0
   };
 }

@@ -77,6 +77,12 @@ export default async function Home() {
             </div>
             <div className="section-body">
               <p className="health-message">{state.lastErrorSummary}</p>
+              {state.lastTechnicalDetail ? (
+                <details className="technical-detail">
+                  <summary>자세한 기술 정보</summary>
+                  <p>{state.lastTechnicalDetail}</p>
+                </details>
+              ) : null}
             </div>
           </section>
         ) : null}

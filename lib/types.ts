@@ -7,6 +7,7 @@ export type MonitorState = {
   lastChangedAt: string | null;
   lastFailedAt: string | null;
   lastErrorSummary: string | null;
+  lastTechnicalDetail: string | null;
   consecutiveFailureCount: number;
 };
 

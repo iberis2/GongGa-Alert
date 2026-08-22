@@ -25,6 +25,7 @@ async function resetData(latestCount: number | null) {
         lastChangedAt: null,
         lastFailedAt: null,
         lastErrorSummary: null,
+        lastTechnicalDetail: null,
         consecutiveFailureCount: 0
       },
       null,
@@ -200,7 +201,8 @@ async function testMonitorFailureStateAndLogDedupe() {
   assert.equal(state.latestCount, 80);
   assert.equal(history.length, 0);
   assert.equal(state.consecutiveFailureCount, 2);
-  assert.match(state.lastErrorSummary || "", /timeout/);
+  assert.match(state.lastErrorSummary || "", /기존에 저장된 입주대기자 수는 유지됩니다/);
+  assert.match(state.lastTechnicalDetail || "", /timeout/);
   assert.equal(
     logs.filter((log) => log.message === "모니터 실행 중 오류가 발생했습니다.").length,
     1
@@ -229,6 +231,7 @@ async function testMonitorRecoveryResetsFailureState() {
   assert.equal(state.consecutiveFailureCount, 0);
   assert.equal(state.lastFailedAt, null);
   assert.equal(state.lastErrorSummary, null);
+  assert.equal(state.lastTechnicalDetail, null);
   assert.ok(logs.some((log) => log.message === "마이홈 확인이 정상 복구되었습니다."));
 }
 
