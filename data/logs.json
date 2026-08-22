@@ -1,5 +1,16 @@
 [
   {
+    "createdAt": "2026-08-22T14:52:19.447Z",
+    "level": "info",
+    "message": "변경 없음: 80"
+  },
+  {
+    "createdAt": "2026-08-22T14:52:19.446Z",
+    "level": "info",
+    "message": "마이홈 확인이 정상 복구되었습니다.",
+    "detail": "이전 연속 실패: 1회"
+  },
+  {
     "createdAt": "2026-08-22T14:43:59.019Z",
     "level": "error",
     "message": "모니터 실행 중 오류가 발생했습니다.",
