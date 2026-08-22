@@ -48,7 +48,10 @@ export type KakaoSendMode = "disabled" | "me" | "friend";
 
 export function getKakaoConfig() {
   const mode = (process.env.KAKAO_SEND_MODE?.trim() || "disabled") as KakaoSendMode;
+  const restApiKey = process.env.KAKAO_REST_API_KEY?.trim() || "";
   const accessToken = process.env.KAKAO_ACCESS_TOKEN?.trim() || "";
+  const refreshToken = process.env.KAKAO_REFRESH_TOKEN?.trim() || "";
+  const clientSecret = process.env.KAKAO_CLIENT_SECRET?.trim() || "";
   const friendUuids =
     process.env.KAKAO_FRIEND_UUIDS?.split(",")
       .map((uuid) => uuid.trim())
@@ -56,7 +59,10 @@ export function getKakaoConfig() {
 
   return {
     mode: ["disabled", "me", "friend"].includes(mode) ? mode : "disabled",
+    restApiKey,
     accessToken,
+    refreshToken,
+    clientSecret,
     friendUuids
   };
 }

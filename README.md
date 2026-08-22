@@ -29,7 +29,10 @@ pnpm monitor
 ```bash
 DASHBOARD_URL=http://localhost:3000
 KAKAO_SEND_MODE=disabled
+KAKAO_REST_API_KEY=
 KAKAO_ACCESS_TOKEN=
+KAKAO_REFRESH_TOKEN=
+KAKAO_CLIENT_SECRET=
 KAKAO_FRIEND_UUIDS=
 ```
 
@@ -67,6 +70,12 @@ pnpm build
 pnpm kakao:test
 ```
 
+토큰 갱신만 로컬 터미널에서 확인하려면 아래 명령을 사용합니다. 출력에 민감한 토큰이 포함되므로 GitHub Actions 로그나 공개 화면에서 실행하지 마세요.
+
+```bash
+pnpm kakao:refresh
+```
+
 ## GitHub Pages 대시보드 배포
 
 배포 URL은 아래 주소를 기본값으로 사용합니다.
@@ -86,7 +95,12 @@ GitHub 저장소에서는 `Settings > Pages > Build and deployment`를 `GitHub A
 카카오 알림까지 GitHub Actions에서 보내려면 저장소 `Settings > Secrets and variables > Actions`에 아래 Secrets를 추가합니다.
 
 - `KAKAO_SEND_MODE`: `me`
+- `KAKAO_REST_API_KEY`: 카카오 앱 REST API 키
 - `KAKAO_ACCESS_TOKEN`: 카카오 액세스 토큰
+- `KAKAO_REFRESH_TOKEN`: 카카오 리프레시 토큰
+- `KAKAO_CLIENT_SECRET`: 카카오 client secret이 켜져 있을 때 필요
 - `KAKAO_FRIEND_UUIDS`: 친구 발송 모드에서만 사용
 
 배포 워크플로는 1시간마다 `pnpm monitor:once`를 실행하고, 변경된 `data/*.json`을 커밋한 뒤 정적 대시보드를 GitHub Pages에 배포합니다.
+
+이 저장소는 공개 저장소를 기준으로 운영합니다. 카카오 토큰은 GitHub Secrets와 로컬 `.env`에만 저장하고, `data/`나 GitHub Pages 산출물에는 저장하지 않습니다. 카카오 토큰 갱신 응답에 새 `refresh_token`이 포함되면 로그에 교체 필요 메시지만 남기며, GitHub Secret `KAKAO_REFRESH_TOKEN`은 직접 새 값으로 교체해야 합니다.

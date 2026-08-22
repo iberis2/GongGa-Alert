@@ -9,6 +9,7 @@
     "start": "next start",
     "monitor": "tsx scripts/monitor.ts",
     "monitor:once": "tsx scripts/monitor-once.ts",
+    "kakao:refresh": "tsx scripts/refresh-kakao-token.ts",
     "kakao:test": "tsx scripts/send-kakao-test.ts",
     "pages:build": "tsx scripts/build-pages.ts",
     "test": "tsx tests/run-tests.ts",
