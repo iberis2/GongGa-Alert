@@ -30,10 +30,10 @@ jobs:
       KAKAO_FRIEND_UUIDS: ${{ secrets.KAKAO_FRIEND_UUIDS }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -45,6 +45,7 @@ jobs:
 
       - name: Run monitor once
         run: pnpm monitor:once
+        continue-on-error: true
 
       - name: Commit updated data
         run: |
