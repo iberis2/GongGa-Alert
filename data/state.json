@@ -3,7 +3,7 @@
   "latestCount": 80,
   "lastCheckedAt": "2026-08-22T13:29:14.544Z",
   "lastChangedAt": null,
-  "lastFailedAt": "2026-08-22T14:19:57.987Z",
+  "lastFailedAt": "2026-08-22T14:27:54.627Z",
   "lastErrorSummary": "TypeError: fetch failed | cause.code=UND_ERR_CONNECT_TIMEOUT | attempt=3 | elapsedMs=10493 | timeoutMs=30000",
-  "consecutiveFailureCount": 1
+  "consecutiveFailureCount": 2
 }
