@@ -4,5 +4,6 @@ node_modules
 .env*.local
 coverage
 dist
+gh-pages
 *.log
 tsconfig.tsbuildinfo

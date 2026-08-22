@@ -66,3 +66,27 @@ pnpm build
 ```bash
 pnpm kakao:test
 ```
+
+## GitHub Pages 대시보드 배포
+
+배포 URL은 아래 주소를 기본값으로 사용합니다.
+
+```bash
+https://iberis2.github.io/GongGa-Alert/
+```
+
+로컬 `.env`에서 카카오 메시지의 대시보드 링크를 GitHub Pages로 보내려면 다음처럼 설정합니다.
+
+```bash
+DASHBOARD_URL=https://iberis2.github.io/GongGa-Alert/
+```
+
+GitHub 저장소에서는 `Settings > Pages > Build and deployment`를 `GitHub Actions`로 설정합니다.
+
+카카오 알림까지 GitHub Actions에서 보내려면 저장소 `Settings > Secrets and variables > Actions`에 아래 Secrets를 추가합니다.
+
+- `KAKAO_SEND_MODE`: `me`
+- `KAKAO_ACCESS_TOKEN`: 카카오 액세스 토큰
+- `KAKAO_FRIEND_UUIDS`: 친구 발송 모드에서만 사용
+
+배포 워크플로는 1시간마다 `pnpm monitor:once`를 실행하고, 변경된 `data/*.json`을 커밋한 뒤 정적 대시보드를 GitHub Pages에 배포합니다.
