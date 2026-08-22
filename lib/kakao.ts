@@ -1,4 +1,4 @@
-import { DASHBOARD_URL, getKakaoConfig } from "./config";
+import { DASHBOARD_URL, DEFAULT_DASHBOARD_URL, getKakaoConfig } from "./config";
 import { appendLog } from "./storage";
 import type { HistoryEntry } from "./types";
 
@@ -28,13 +28,31 @@ function buildMessage(change: HistoryEntry, dashboardUrl: string) {
   ].join("\n");
 }
 
+function normalizeDashboardUrl(value: string) {
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return DEFAULT_DASHBOARD_URL;
+    }
+
+    return url.toString();
+  } catch {
+    return DEFAULT_DASHBOARD_URL;
+  }
+}
+
 function buildDefaultTemplate(change: HistoryEntry, dashboardUrl: string) {
+  const normalizedDashboardUrl = normalizeDashboardUrl(dashboardUrl);
+
   return {
     object_type: "text",
-    text: buildMessage(change, dashboardUrl),
+    text: buildMessage(change, normalizedDashboardUrl),
     link: {
-      web_url: dashboardUrl,
-      mobile_web_url: dashboardUrl
+      web_url: normalizedDashboardUrl,
+      mobile_web_url: normalizedDashboardUrl,
+      android_execution_params: `url=${encodeURIComponent(normalizedDashboardUrl)}`,
+      ios_execution_params: `url=${encodeURIComponent(normalizedDashboardUrl)}`
     },
     button_title: "대시보드 보기"
   };

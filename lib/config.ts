@@ -40,9 +40,10 @@ export const DEFAULT_SOURCE_URL =
   "https://www.myhome.go.kr/hws/portal/sch/selectMoveWaitStsDetail.do?hsmpSn=30700355&suplyTy=02&atchFileId=FLE00016014&rtsSe=01&styleNm=46&drwtUnit=46";
 
 export const CHECK_INTERVAL_MS = 60 * 60 * 1000;
+export const DEFAULT_DASHBOARD_URL = "https://iberis2.github.io/GongGa-Alert/";
 
 export const DASHBOARD_URL =
-  process.env.DASHBOARD_URL?.trim() || "http://localhost:3000";
+  process.env.DASHBOARD_URL?.trim() || DEFAULT_DASHBOARD_URL;
 
 export type KakaoSendMode = "disabled" | "me" | "friend";
 

@@ -146,6 +146,45 @@ async function testKakaoSendsWithoutRefresh() {
   assert.equal(calls[0], "https://kapi.kakao.com/v2/api/talk/memo/default/send");
 }
 
+async function testKakaoTemplateUsesDashboardUrlForButton() {
+  await resetKakaoEnv();
+  const originalFetch = globalThis.fetch;
+  type CapturedTemplate = {
+    text: string;
+    link: {
+      web_url: string;
+      mobile_web_url: string;
+      android_execution_params: string;
+      ios_execution_params: string;
+    };
+  };
+  const templates: CapturedTemplate[] = [];
+
+  globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    const body = init?.body as URLSearchParams;
+    templates.push(JSON.parse(String(body.get("template_object"))) as CapturedTemplate);
+    return new Response("{}", { status: 200 });
+  }) as typeof fetch;
+
+  try {
+    await sendKakaoChangeMessage(makeChange(), "https://iberis2.github.io/GongGa-Alert/");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  const sentTemplate = templates[0];
+
+  if (!sentTemplate) {
+    throw new Error("Kakao template was not captured.");
+  }
+
+  assert.match(sentTemplate.text, /https:\/\/iberis2\.github\.io\/GongGa-Alert\//);
+  assert.equal(sentTemplate.link.web_url, "https://iberis2.github.io/GongGa-Alert/");
+  assert.equal(sentTemplate.link.mobile_web_url, "https://iberis2.github.io/GongGa-Alert/");
+  assert.match(sentTemplate.link.android_execution_params, /GongGa-Alert/);
+  assert.match(sentTemplate.link.ios_execution_params, /GongGa-Alert/);
+}
+
 async function testKakaoRefreshesAfterUnauthorized() {
   await resetKakaoEnv();
   const calls: string[] = [];
@@ -230,6 +269,7 @@ try {
   await testUnchangedRun();
   await testChangedRun();
   await testKakaoSendsWithoutRefresh();
+  await testKakaoTemplateUsesDashboardUrlForButton();
   await testKakaoRefreshesAfterUnauthorized();
   await testKakaoFailureMasksSecrets();
   console.log("All tests passed.");
