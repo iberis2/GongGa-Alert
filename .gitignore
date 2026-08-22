@@ -5,6 +5,7 @@ node_modules
 coverage
 dist
 gh-pages
+diagnostics
 monitor-result.json
 data/kakao-token*.json
 *.log

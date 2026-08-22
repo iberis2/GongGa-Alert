@@ -10,6 +10,7 @@
     "monitor": "tsx scripts/monitor.ts",
     "monitor:once": "tsx scripts/monitor-once.ts",
     "monitor:ci": "tsx scripts/monitor-ci.ts",
+    "diagnose:myhome": "tsx scripts/diagnose-myhome.ts",
     "kakao:refresh": "tsx scripts/refresh-kakao-token.ts",
     "kakao:test": "tsx scripts/send-kakao-test.ts",
     "pages:build": "tsx scripts/build-pages.ts",
