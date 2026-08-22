@@ -87,6 +87,14 @@ a {
   background: var(--accent);
 }
 
+.status-pill[data-status="warn"] {
+  background: #fff7e8;
+}
+
+.status-pill[data-status="warn"] .status-dot {
+  background: var(--warn);
+}
+
 .content {
   padding: 28px 0 48px;
 }
@@ -133,6 +141,17 @@ a {
   grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
   gap: 18px;
   margin-top: 18px;
+}
+
+.health-section {
+  margin-top: 18px;
+}
+
+.health-message {
+  margin: 0;
+  color: var(--warn);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .section {

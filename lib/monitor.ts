@@ -1,6 +1,6 @@
 import { DASHBOARD_URL } from "./config";
 import { sendKakaoChangeMessage } from "./kakao";
-import { fetchNoticeHtml } from "./myhome";
+import { fetchNoticeHtml, formatMyHomeError } from "./myhome";
 import { parseWaitlistCount } from "./parser";
 import {
   appendLog,
@@ -16,6 +16,21 @@ type MonitorDeps = {
   dashboardUrl?: string;
 };
 
+function markHealthy<T extends { lastFailedAt: string | null; lastErrorSummary: string | null; consecutiveFailureCount: number }>(
+  state: T
+) {
+  return {
+    ...state,
+    lastFailedAt: null,
+    lastErrorSummary: null,
+    consecutiveFailureCount: 0
+  };
+}
+
+function summarizeMonitorError(error: unknown) {
+  return formatMyHomeError(error);
+}
+
 export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorResult> {
   const fetchHtml = deps.fetchHtml || fetchNoticeHtml;
   const sendMessage = deps.sendMessage || sendKakaoChangeMessage;
@@ -28,17 +43,23 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
     const currentCount = parseWaitlistCount(html);
 
     if (currentCount === null) {
-      await appendLog({
-        level: "error",
-        message: "입주대기자 수를 찾지 못했습니다.",
-        detail: state.sourceUrl
-      });
       throw new Error("입주대기자 수를 찾지 못했습니다.");
+    }
+
+    const hadFailures = state.consecutiveFailureCount > 0;
+    const healthyState = markHealthy(state);
+
+    if (hadFailures) {
+      await appendLog({
+        level: "info",
+        message: "마이홈 확인이 정상 복구되었습니다.",
+        detail: `이전 연속 실패: ${state.consecutiveFailureCount}회`
+      });
     }
 
     if (state.latestCount === null) {
       await saveState({
-        ...state,
+        ...healthyState,
         latestCount: currentCount,
         lastCheckedAt: checkedAt
       });
@@ -56,7 +77,7 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
 
     if (state.latestCount === currentCount) {
       await saveState({
-        ...state,
+        ...healthyState,
         latestCount: currentCount,
         lastCheckedAt: checkedAt
       });
@@ -82,7 +103,7 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
 
     await recordHistory(change);
     await saveState({
-      ...state,
+      ...healthyState,
       latestCount: currentCount,
       lastCheckedAt: checkedAt,
       lastChangedAt: checkedAt
@@ -94,11 +115,36 @@ export async function runMonitorOnce(deps: MonitorDeps = {}): Promise<MonitorRes
       change
     };
   } catch (error) {
-    await appendLog({
-      level: "error",
-      message: "모니터 실행 중 오류가 발생했습니다.",
-      detail: error instanceof Error ? error.message : String(error)
+    const latestState = await loadState();
+    const errorSummary = summarizeMonitorError(error);
+    const isSameError = latestState.lastErrorSummary === errorSummary;
+    const consecutiveFailureCount = isSameError
+      ? latestState.consecutiveFailureCount + 1
+      : 1;
+
+    await saveState({
+      ...latestState,
+      lastFailedAt: checkedAt,
+      lastErrorSummary: errorSummary,
+      consecutiveFailureCount
     });
+
+    if (!isSameError) {
+      await appendLog({
+        level: "error",
+        message: "모니터 실행 중 오류가 발생했습니다.",
+        detail: errorSummary
+      });
+    }
+
+    if (consecutiveFailureCount === 3) {
+      await appendLog({
+        level: "warn",
+        message: "마이홈 확인이 3회 연속 실패했습니다.",
+        detail: errorSummary
+      });
+    }
+
     throw error;
   }
 }

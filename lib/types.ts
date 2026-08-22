@@ -5,6 +5,9 @@ export type MonitorState = {
   latestCount: number | null;
   lastCheckedAt: string | null;
   lastChangedAt: string | null;
+  lastFailedAt: string | null;
+  lastErrorSummary: string | null;
+  consecutiveFailureCount: number;
 };
 
 export type HistoryEntry = {
@@ -38,4 +41,10 @@ export type MonitorResult =
   | {
       status: "changed";
       change: HistoryEntry;
+    }
+  | {
+      status: "failed";
+      checkedAt: string;
+      errorSummary: string;
+      consecutiveFailureCount: number;
     };

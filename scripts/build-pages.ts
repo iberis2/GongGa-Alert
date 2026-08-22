@@ -93,8 +93,11 @@ function renderLogs(logs: LogEntry[]) {
 }
 
 function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry[]) {
-  const latestChange = history[0];
   const generatedAt = new Date().toISOString();
+  const isFailing = state.consecutiveFailureCount > 0;
+  const statusText = isFailing
+    ? `확인 실패 ${state.consecutiveFailureCount}회`
+    : "정상 확인";
 
   return `<!doctype html>
 <html lang="ko">
@@ -160,6 +163,12 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
         border-radius: 50%;
         background: var(--accent);
       }
+      .status-pill.warn {
+        background: #fff7e8;
+      }
+      .status-pill.warn .status-dot {
+        background: var(--warn);
+      }
       .content { padding: 28px 0 48px; }
       .summary-grid {
         display: grid;
@@ -190,6 +199,12 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
         grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
         gap: 18px;
         margin-top: 18px;
+      }
+      .health-message {
+        margin: 0;
+        color: var(--warn);
+        line-height: 1.6;
+        overflow-wrap: anywhere;
       }
       .section { overflow: hidden; }
       .section-header {
@@ -256,9 +271,9 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
           <h1>입주대기자 수 알리미</h1>
           <p class="subtitle">GitHub Pages에 배포된 마이홈 예비입주자 대기현황 대시보드입니다.</p>
         </div>
-        <div class="status-pill">
+        <div class="status-pill ${isFailing ? "warn" : ""}">
           <span class="status-dot"></span>
-          ${escapeHtml(formatDate(generatedAt))} 갱신
+          ${escapeHtml(statusText)} · ${escapeHtml(formatDate(generatedAt))} 갱신
         </div>
       </div>
     </header>
@@ -272,7 +287,7 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
         <div class="metric">
           <span>마지막 확인</span>
           <strong>${escapeHtml(formatDate(state.lastCheckedAt))}</strong>
-          <small>모니터가 실행된 최근 시각입니다.</small>
+          <small>정상으로 값을 읽은 최근 시각입니다.</small>
         </div>
         <div class="metric">
           <span>마지막 변경</span>
@@ -280,15 +295,27 @@ function renderPage(state: MonitorState, history: HistoryEntry[], logs: LogEntry
           <small>입주대기자 수가 달라진 최근 시각입니다.</small>
         </div>
         <div class="metric">
-          <span>최근 변화량</span>
-          <strong>${
-            latestChange?.diff === null || latestChange?.diff === undefined
-              ? "-"
-              : `${latestChange.diff > 0 ? "+" : ""}${latestChange.diff}`
-          }</strong>
-          <small>변경 이력의 최신 항목 기준입니다.</small>
+          <span>모니터 상태</span>
+          <strong>${isFailing ? `${state.consecutiveFailureCount}회 실패` : "정상"}</strong>
+          <small>${
+            isFailing
+              ? `마지막 실패: ${escapeHtml(formatDate(state.lastFailedAt))}`
+              : "마지막 정상값을 유지합니다."
+          }</small>
         </div>
       </section>
+      ${
+        isFailing
+          ? `<section class="section" style="margin-top:18px">
+              <div class="section-header">
+                <h2>확인 실패 진단</h2>
+              </div>
+              <div class="section-body">
+                <p class="health-message">${escapeHtml(state.lastErrorSummary || "")}</p>
+              </div>
+            </section>`
+          : ""
+      }
       <div class="layout">
         <section class="section table-section">
           <div class="section-header">
@@ -334,7 +361,10 @@ const state = await readJson<MonitorState>("state.json", {
   sourceUrl: "",
   latestCount: null,
   lastCheckedAt: null,
-  lastChangedAt: null
+  lastChangedAt: null,
+  lastFailedAt: null,
+  lastErrorSummary: null,
+  consecutiveFailureCount: 0
 });
 const history = await readJson<HistoryEntry[]>("history.json", []);
 const logs = await readJson<LogEntry[]>("logs.json", []);

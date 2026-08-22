@@ -12,7 +12,10 @@ const DEFAULT_STATE: MonitorState = {
   sourceUrl: DEFAULT_SOURCE_URL,
   latestCount: null,
   lastCheckedAt: null,
-  lastChangedAt: null
+  lastChangedAt: null,
+  lastFailedAt: null,
+  lastErrorSummary: null,
+  consecutiveFailureCount: 0
 };
 
 async function ensureDataDir() {
@@ -41,7 +44,19 @@ async function writeJsonFile(filePath: string, value: unknown) {
 
 export async function loadState(): Promise<MonitorState> {
   await ensureDataDir();
-  return readJsonFile(STATE_PATH, DEFAULT_STATE);
+  const state = await readJsonFile<Partial<MonitorState>>(STATE_PATH, DEFAULT_STATE);
+
+  return {
+    ...DEFAULT_STATE,
+    ...state,
+    sourceUrl: state.sourceUrl || DEFAULT_STATE.sourceUrl,
+    latestCount: state.latestCount ?? null,
+    lastCheckedAt: state.lastCheckedAt ?? null,
+    lastChangedAt: state.lastChangedAt ?? null,
+    lastFailedAt: state.lastFailedAt ?? null,
+    lastErrorSummary: state.lastErrorSummary ?? null,
+    consecutiveFailureCount: state.consecutiveFailureCount ?? 0
+  };
 }
 
 export async function saveState(state: MonitorState) {

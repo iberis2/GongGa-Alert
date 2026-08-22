@@ -47,8 +47,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run monitor once
+        id: monitor
         run: pnpm monitor:once
         continue-on-error: true
+
+      - name: Diagnose MyHome connectivity
+        if: steps.monitor.outcome == 'failure'
+        run: |
+          curl -4 -v --connect-timeout 10 --max-time 30 \
+            "https://www.myhome.go.kr/hws/portal/sch/selectMoveWaitStsDetail.do?hsmpSn=30700355&suplyTy=02&atchFileId=FLE00016014&rtsSe=01&styleNm=46&drwtUnit=46" \
+            || true
 
       - name: Commit updated data
         run: |

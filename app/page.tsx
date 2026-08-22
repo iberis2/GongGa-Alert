@@ -18,6 +18,10 @@ export default async function Home() {
     loadLogs()
   ]);
   const latestChange = history[0];
+  const isFailing = state.consecutiveFailureCount > 0;
+  const statusText = isFailing
+    ? `확인 실패 ${state.consecutiveFailureCount}회`
+    : "정상 확인";
 
   return (
     <main className="page">
@@ -27,9 +31,9 @@ export default async function Home() {
             <h1>입주대기자 수 알리미</h1>
             <p>마이홈 예비입주자 대기현황을 1시간마다 확인합니다.</p>
           </div>
-          <div className="status-pill" aria-label="모니터 상태">
+          <div className="status-pill" data-status={isFailing ? "warn" : "ok"} aria-label="모니터 상태">
             <span className="status-dot" aria-hidden="true" />
-            로컬 모니터 준비
+            {statusText}
           </div>
         </div>
       </header>
@@ -48,7 +52,7 @@ export default async function Home() {
           <div className="metric">
             <span>마지막 확인</span>
             <strong>{formatDate(state.lastCheckedAt)}</strong>
-            <small>모니터가 실행된 최근 시각입니다.</small>
+            <small>정상으로 값을 읽은 최근 시각입니다.</small>
           </div>
           <div className="metric">
             <span>마지막 변경</span>
@@ -56,15 +60,26 @@ export default async function Home() {
             <small>입주대기자 수가 달라진 최근 시각입니다.</small>
           </div>
           <div className="metric">
-            <span>최근 변화량</span>
-            <strong>
-              {latestChange?.diff === null || latestChange?.diff === undefined
-                ? "-"
-                : `${latestChange.diff > 0 ? "+" : ""}${latestChange.diff}`}
-            </strong>
-            <small>변경 이력의 최신 항목 기준입니다.</small>
+            <span>모니터 상태</span>
+            <strong>{isFailing ? `${state.consecutiveFailureCount}회 실패` : "정상"}</strong>
+            <small>
+              {isFailing
+                ? `마지막 실패: ${formatDate(state.lastFailedAt)}`
+                : "마지막 정상값을 유지합니다."}
+            </small>
           </div>
         </section>
+
+        {isFailing ? (
+          <section className="section health-section">
+            <div className="section-header">
+              <h2>확인 실패 진단</h2>
+            </div>
+            <div className="section-body">
+              <p className="health-message">{state.lastErrorSummary}</p>
+            </div>
+          </section>
+        ) : null}
 
         <div className="layout">
           <section className="section table-section">
