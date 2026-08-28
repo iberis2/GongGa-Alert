@@ -1,5 +1,11 @@
 [
   {
+    "createdAt": "2026-08-28T04:09:50.400Z",
+    "level": "error",
+    "message": "모니터 실행 중 오류가 발생했습니다.",
+    "detail": "마이홈 공고 페이지에 접속하지 못했습니다. 네트워크 연결이 시간 안에 완료되지 않았고, 총 3번 재시도했지만 실패했습니다. 마이홈 사이트가 일시적으로 느리거나 GitHub Actions 서버에서 마이홈 사이트 접속이 제한되었을 가능성이 있습니다. 기존에 저장된 입주대기자 수는 유지됩니다.\n\n기술 상세: TypeError: fetch failed | cause.code=UND_ERR_CONNECT_TIMEOUT | attempt=3 | elapsedMs=10492 | timeoutMs=30000"
+  },
+  {
     "createdAt": "2026-08-27T19:45:50.872Z",
     "level": "error",
     "message": "모니터 실행 중 오류가 발생했습니다.",
