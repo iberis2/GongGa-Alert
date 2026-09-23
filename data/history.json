@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "checkedAt": "2026-09-23T23:32:05.481Z",
+    "previousCount": 80,
+    "currentCount": 77,
+    "diff": -3,
+    "sourceUrl": "https://www.myhome.go.kr/hws/portal/sch/selectMoveWaitStsDetail.do?hsmpSn=30700355&suplyTy=02&atchFileId=FLE00016014&rtsSe=01&styleNm=46&drwtUnit=46"
+  }
+]

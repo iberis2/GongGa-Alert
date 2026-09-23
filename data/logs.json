@@ -1,5 +1,21 @@
 [
   {
+    "createdAt": "2026-09-23T23:32:13.326Z",
+    "level": "warn",
+    "message": "카카오 refresh token이 갱신되었습니다. GitHub Secret KAKAO_REFRESH_TOKEN을 새 값으로 수동 교체해야 합니다."
+  },
+  {
+    "createdAt": "2026-09-23T23:32:13.325Z",
+    "level": "info",
+    "message": "카카오 access token 갱신 후 메시지 발송 성공"
+  },
+  {
+    "createdAt": "2026-09-23T23:32:09.372Z",
+    "level": "info",
+    "message": "마이홈 확인이 정상 복구되었습니다.",
+    "detail": "이전 연속 실패: 1회"
+  },
+  {
     "createdAt": "2026-09-23T20:07:08.226Z",
     "level": "error",
     "message": "모니터 실행 중 오류가 발생했습니다.",
@@ -1176,24 +1192,6 @@
   },
   {
     "createdAt": "2026-08-22T13:41:48.076Z",
-    "level": "error",
-    "message": "모니터 실행 중 오류가 발생했습니다.",
-    "detail": "fetch failed"
-  },
-  {
-    "createdAt": "2026-08-22T13:37:20.277Z",
-    "level": "error",
-    "message": "모니터 실행 중 오류가 발생했습니다.",
-    "detail": "fetch failed"
-  },
-  {
-    "createdAt": "2026-08-22T13:29:03.697Z",
-    "level": "error",
-    "message": "모니터 실행 중 오류가 발생했습니다.",
-    "detail": "fetch failed"
-  },
-  {
-    "createdAt": "2026-08-22T13:22:47.081Z",
     "level": "error",
     "message": "모니터 실행 중 오류가 발생했습니다.",
     "detail": "fetch failed"
